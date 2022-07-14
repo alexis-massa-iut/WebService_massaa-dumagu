@@ -1,0 +1,38 @@
+{% extends "common/base.html.twig" %}
+
+{% block title %}
+	User account
+{% endblock %}
+{% block body %}
+	<h1>My account</h1>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<td colspan="2"></td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Email(login):</td>
+				<td class="align-middle">{{ user.email }}</td>
+			</tr>
+			<tr>
+				<td>Name:</td>
+				<td class="align-middle">{{ user.name }}</td>
+			</tr>
+			<tr>
+				<td>Lastname:</td>
+				<td class="align-middle">{{ user.lastname }}</td>
+			</tr>
+			<tr>
+				<td>Roles:</td>
+				<td class="align-middle">{{ user.roles ? user.roles|json_encode : '' }}</td>
+			</tr>
+			<tr>
+				<td>Actions:</td>
+				<td class="align-middle">{{ include('user/_delete_form.html.twig') }}</td>
+			</tr>
+		</tbody>
+	</td>
+</tbody></table>{% endblock %}

@@ -1,0 +1,19 @@
+{{ form_start(form) }}
+<div class="my-custom-class-for-errors"> {{ form_errors(form) }}
+</div>
+
+<div class="row">
+	<div class="col"> {{ form_row(form.name) }}</div>
+	<div class="col"> {{ form_row(form.lastname) }}</div>
+</div>
+<div class="row">
+	<div class="col"> {{ form_row(form.email) }}</div>
+	<div class="col"> {{ form_row(form.password) }}</div>
+</div>
+{% if not role_access %}
+	(Accessible par question de simplicité)
+{% endif %}
+<div class="row">
+	<div class="col"> {{ form_row(form.roles) }}</div>
+</div>
+<button class="btn btn-primary">{{ button_label|default('Save') }}</button> {{ form_end(form) }}

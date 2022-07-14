@@ -1,0 +1,56 @@
+{% extends "common/base.html.twig" %}
+{% block title %}My commands
+{% endblock %}
+{% block body %}
+	<script src="{{ asset("js/command.js") }}"></script>
+	<style src="{{ asset("style/command.css") }}"></style>
+	<h1>All your commands:</h1>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Date</th>
+				<th>Total</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for command in commands %}
+				<tr style="border: 2px solid black;">
+					<td>{{ command.id }}</td>
+					<td>{{ command.date ? command.date|date('Y-m-d H:i:s') : '' }}</td>
+					<td>{{ command.total }}€</td>
+					<td>{{ command.status }}</td>
+					<td>
+						<!-- Button trigger modal -->
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{command.id}}">
+							See
+							<i class="bi bi-arrows-angle-expand"></i>
+						</button>
+
+						<!-- Modal -->
+						<div class="modal fade" id="modal{{command.id}}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{command.id}}" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalLabel{{command.id}}">Command: {{command.id}}</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">{{ include('command_line/index.html.twig', {'command_lines': command.commandlines })}}
+									<div><strong>Total: {{command.total}}€</strong></div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-light" onclick="location.href='{{ path('user_command', {'id': command.id}) }}'">Details</button>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</td>
+		</tbody>
+	</tr>
+</div></tbody></td></tr>{% else %}<tr><td colspan="4">no records found</td></tr>{% endfor %}</tbody></tbody></table>{% endblock %}

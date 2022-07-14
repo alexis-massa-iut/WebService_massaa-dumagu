@@ -1,0 +1,104 @@
+<!-- Navbar -->
+<script src="{{ asset("js/navbar.js") }}"></script>
+<nav
+	class="navbar navbar-expand-lg navbar-light bg-light">
+	<!-- Container wrapper -->
+	<div
+		class="container-fluid">
+
+		<!-- Left links -->
+		<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+			<li class="nav-item">
+				<a class="nav-link" href="{{ path('home_page') }}"> {{ 'default.index.home'|trans}}
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="{{ path('shop_index') }}"> {{ 'default.index.shop'|trans}}
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="{{ path('contact_page') }}"> {{ 'default.index.contact'|trans}}
+				</a>
+			</li>
+			{% if is_granted('ROLE_ADMIN') %}
+				<!-- Admin links -->
+				<li class="nav-item">
+					<div class="dropdown show">
+						<a class="btn dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Admin
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+							<a class="dropdown-item" href="{{ path('product_index') }}">Manage products</a>
+							<a class="dropdown-item" href="{{ path('category_index') }}">Manage categories</a>
+							<a class="dropdown-item" href="{{ path('user_index') }}">Manage users</a>
+						</div>
+					</div>
+				</li>
+			{% endif %}
+
+		</ul>
+		<!-- Left links -->
+
+		<!-- Right elements -->
+		<div
+			class="d-flex align-items-center">
+			<!-- Cart icon -->
+			<a class="text-reset me-3" href="{{ path('cart_index')}}">
+				<i class="bi bi-cart3"></i>
+			</a>
+
+			<!-- Language selection -->
+
+			{# Languages #}
+			{% for lang in supported_locales|split("|") %}
+				{# Check if different from current language #}
+				{% if lang != app.request.attributes.get('_locale') %}
+					<a href="{{ path(app.request.get('_route'), app.request.get('_route_params')|merge({'_locale': lang})) }}">
+						<img src="{{asset('img/locales/'~lang~'.png')}}" alt="{{lang}}">
+					</a>
+				{% endif %}
+			{% endfor %}
+
+			<!-- Search bar -->
+			<form id="search-form" onsubmit="return processForm('{{path('search_page', {'_locale': app.request.attributes.get('_locale')})}}')">
+				<input id="search-text" type="text" placeholder="{{ 'default.index.search'|trans }}" name="search">
+				<button type="submit">
+					<i class="bi bi-search"></i>
+				</button>
+			</form>
+			<!-- LOGIN / LOGOUT -->
+			{% if app.user %}
+				<!-- Account links -->
+				<li class="nav-item">
+					<div class="dropdown show">
+						<a class="btn dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Account: {{ app.user.name }}
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+							<a class="dropdown-item" href="{{ path('user_account') }}">Profile</a>
+							<a class="dropdown-item" href="{{ path('user_commands') }}">Commands</a>
+						</div>
+					</div>
+				</li>
+				{# LOGOUT #}
+				<a class="nav-link" href="{{ path('app_logout') }}">
+					<button type="button" class="btn btn-light">Logout</button>
+				</a>
+			{% else %}
+				{# LOGIN #}
+				<a class="nav-link" href="{{ path('app_login', app.request.attributes.get('_route_params')|merge({ _locale: app.request.locale })) }}">
+					<button type="button" class="btn btn-light">Login</button>
+				</a>
+				{# SIGN IN #}
+				<a class="nav-link" href="{{ path('user_new', app.request.attributes.get('_route_params')|merge({ _locale: app.request.locale })) }}">
+					<button type="button" class="btn btn-light">Sign in</button>
+				</a>
+			{% endif %}
+
+
+		</div>
+		<!-- Right elements -->
+	</div>
+	<!-- Container wrapper -->
+</nav>
+<!-- Navbar -->
