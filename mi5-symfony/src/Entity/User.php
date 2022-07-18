@@ -1,15 +1,27 @@
 <?php
 
+/**
+ * User.php
+ *
+ * @author Alexis Massa
+ * Created on Sun Jul 17 2022
+ **/
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * User
  *
  * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_8D93D649E7927C74", columns={"email"})})
  * @ORM\Entity
+ * @ApiResource
+ * @ApiFilter(NumericFilter::class, properties={"id"})
+ * @ApiFilter(SearchFilter::class, properties={"email": "partial", "name": "partial", "lastname": "partial"})
  */
 class User
 {
@@ -26,6 +38,7 @@ class User
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=180, nullable=false)
+     * @NotBlank("Email non renseigné")
      */
     private $email;
 
@@ -33,6 +46,7 @@ class User
      * @var array
      *
      * @ORM\Column(name="roles", type="json", nullable=false)
+     * @NotBlank("Roles non renseignés")
      */
     private $roles;
 
@@ -40,6 +54,7 @@ class User
      * @var string
      *
      * @ORM\Column(name="password", type="string", length=255, nullable=false)
+     * @NotBlank("Mot de passe non renseigné")
      */
     private $password;
 
@@ -47,6 +62,7 @@ class User
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     * @NotBlank("Prénom non renseigné")
      */
     private $name;
 
@@ -54,6 +70,7 @@ class User
      * @var string
      *
      * @ORM\Column(name="lastname", type="string", length=255, nullable=false)
+     * @NotBlank("Nom non renseigné")
      */
     private $lastname;
 
@@ -121,6 +138,4 @@ class User
 
         return $this;
     }
-
-
 }

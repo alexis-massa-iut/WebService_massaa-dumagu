@@ -1,29 +1,64 @@
 <?php
 
+/**
+ * CommandLine.php
+ *
+ * @author Alexis Massa
+ * Created on Sun Jul 17 2022
+ **/
+
 namespace App\Entity;
 
 use App\Repository\CommandLineRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 
-#[ORM\Entity(repositoryClass: CommandLineRepository::class)]
+/**
+ * CommandLine
+ * 
+ * @ORM\Table(name="command_line")
+ * @ORM\Entity
+ * @ApiResource
+ */
 class CommandLine
 {
 
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Command::class, inversedBy: 'commandLines')]
-    #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @var \Command
+     *
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Command", inversedBy="commandLines")
+     * @ORM\JoinColumns(nullable=false)
+     * @ApiSubresource
+     * @Groups({"command"})
+     * @MaxDepth(1)
+     */
     private $command;
 
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @var \Product
+     * 
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Product")
+     * @ORM\JoinColumn(nullable=false)
+     * @ApiSubresource
+     * @Groups({"command"})
+     * @MaxDepth(1)
+     */
     private $product;
 
-    #[ORM\Column(type: 'integer')]
+    /**
+     * @var amount
+     * 
+     * @ORM\Column(name="amount", type="integer")
+     */
     private $amount;
 
-    #[ORM\Column(type: 'float')]
+    /**
+     * @var price
+     * 
+     * @ORM\Column(name="price", type="float")
+     */
     private $price;
 
     public function getId(): ?int

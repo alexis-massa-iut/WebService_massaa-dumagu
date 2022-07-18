@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Command.php
+ *
+ * @author Alexis Massa
+ * Created on Sun Jul 17 2022
+ **/
+
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -7,12 +14,21 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * Command
  *
  * @ORM\Table(name="command", indexes={@ORM\Index(name="IDX_8ECAEAD4A76ED395", columns={"user_id"})})
  * @ORM\Entity
+ * @ApiResource
+ * @ApiResource(normalizationContext={"groups"={"command"}})
+ * @ApiFilter(NumericFilter::class, properties={"id"})
+ * @ApiFilter(DateFilter::class, properties={"date"})
+ * @ApiFilter(SearchFilter::class, properties={"status": "exact", "user.id": "exact"})
  */
 class Command
 {
@@ -29,6 +45,7 @@ class Command
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="datetime", nullable=false)
+     * @NotBlank("Date non renseignée")
      */
     private $date;
 
@@ -36,6 +53,7 @@ class Command
      * @var string
      *
      * @ORM\Column(name="status", type="string", length=255, nullable=false)
+     * @NotBlank("Statut non renseigné")
      */
     private $status;
 
@@ -136,5 +154,4 @@ class Command
 
         return $this;
     }
-
 }

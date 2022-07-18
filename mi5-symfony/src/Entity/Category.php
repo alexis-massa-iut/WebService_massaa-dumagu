@@ -1,8 +1,20 @@
 <?php
 
+/**
+ * Category.php
+ *
+ * @author Alexis Massa
+ * Created on Sun Jul 17 2022
+ **/
+
+
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,6 +23,9 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="category")
  * @ORM\Entity
+ * @ApiResource
+ * @ApiFilter(RangeFilter::class, properties={"id"})
+ * @ApiFilter(SearchFilter::class, properties={"name": "partial"})
  */
 class Category
 {
@@ -27,6 +42,7 @@ class Category
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     * @NotBlank("Nom non renseigné")
      */
     private $name;
 
@@ -34,6 +50,7 @@ class Category
      * @var string
      *
      * @ORM\Column(name="img", type="string", length=255, nullable=false)
+     * @NotBlank("Image non renseigné")
      */
     private $img;
 
@@ -41,6 +58,7 @@ class Category
      * @var string
      *
      * @ORM\Column(name="text", type="text", length=0, nullable=false)
+     * @NotBlank("Texte non renseigné")
      */
     private $text;
 
