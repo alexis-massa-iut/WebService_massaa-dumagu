@@ -15,79 +15,79 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotNull;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * Command
  *
- * @ORM\Table(name="command", indexes={@ORM\Index(name="IDX_8ECAEAD4A76ED395", columns={"user_id"})})
- * @ORM\Entity
- * @ApiResource
- * @ApiResource(normalizationContext={"groups"={"command"}})
+ * @ORM\Entity(repositoryClass=CommandRepository::class)
+ * @ApiResource(normalizationContext={"groups"={"command"},"enable_max_depth"=true})
  * @ApiFilter(NumericFilter::class, properties={"id"})
- * @ApiFilter(DateFilter::class, properties={"date"})
- * @ApiFilter(SearchFilter::class, properties={"status": "exact", "user.id": "exact"})
+ * @ApiFilter(RangeFilter::class, properties={"date"})
+ * @ApiFilter(SearchFilter::class, properties={"status": "exact"})
  */
 class Command
 {
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     * @Groups({"product","command","commandLine"})
      */
     private $id;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="date", type="datetime", nullable=false)
-     * @NotBlank("Date non renseignée")
+     * @ORM\Column(type="date")
+     * @NotNull(message="Date ne doit pas etre null")
+     * @Assert\NotBlank(message="Date ne doit pas etre vide")
      */
     private $date;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="status", type="string", length=255, nullable=false)
-     * @NotBlank("Statut non renseigné")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Statut ne doit pas etre null")
+     * @Assert\NotBlank(message="Statut ne doit pas etre vide")
+     * @Groups({"product","command","commandLine"})
      */
     private $status;
 
     /**
      * @var \User
      *
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="commands")
+     * @ORM\JoinColumn(nullable=false)
+     * @NotNull(message="User ne doit pas etre null")
+     * @Assert\NotBlank(message="User ne doit pas etre vide.")
      */
     private $user;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="Product", inversedBy="command")
-     * @ORM\JoinTable(name="command_line",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="command_id", referencedColumnName="id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="product_id", referencedColumnName="id")
-     *   }
-     * )
+     * @ORM\OneToMany(targetEntity=CommandLine::class, mappedBy="command", orphanRemoval=true)
+     * @Groups({"command"})
+     * @MaxDepth(1)
      */
-    private $product;
+    private $commandLines;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->product = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->commandLines = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function getId(): ?int
@@ -132,25 +132,31 @@ class Command
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return Collection|CommandLine[]
      */
-    public function getProduct(): Collection
+    public function getCommandLines(): Collection
     {
-        return $this->product;
+        return $this->commandLines;
     }
 
-    public function addProduct(Product $product): self
+    public function addCommandLine(CommandLine $commandLine): self
     {
-        if (!$this->product->contains($product)) {
-            $this->product[] = $product;
+        if (!$this->commandLines->contains($commandLine)) {
+            $this->commandLines[] = $commandLine;
+            $commandLine->setCommand($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $product): self
+    public function removeCommandLine(CommandLine $commandLine): self
     {
-        $this->product->removeElement($product);
+        if ($this->commandLines->removeElement($commandLine)) {
+            // set the owning side to null (unless already changed)
+            if ($commandLine->getCommand() === $this) {
+                $commandLine->setCommand(null);
+            }
+        }
 
         return $this;
     }

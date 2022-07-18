@@ -5,11 +5,12 @@ api_platform:
     json: ['application/merge-patch+json']
   swagger:
     versions: [3]
-  formats:
-    json:
-      mime_types: ['application/json']
-    xml:
-      mime_types: ['application/xml', 'text/xml']
+  # TODO : Formats
+  # formats:
+  #   json:
+  #     mime_types: ['application/json']
+  #   xml:
+  #     mime_types: ['application/xml', 'text/xml']
   title: 'e-Shopping REST API'
   version: 1.0.0
   collection:

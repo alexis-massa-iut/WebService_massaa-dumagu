@@ -13,80 +13,90 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotNull;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Product
  *
- * @ORM\Table(name="product", indexes={@ORM\Index(name="IDX_D34A04AD12469DE2", columns={"category_id"})})
- * @ORM\Entity
- * @ApiResource
+ * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @ApiResource(normalizationContext={"groups"={"product"},"enable_max_depth"=true})
  * @ApiFilter(RangeFilter::class, properties={"id"})
- * @ApiFilter(SearchFilter::class, properties={"name": "partial"})
+ * @ApiFilter(SearchFilter::class, properties={"name": "partial","text":"partial","price": "exact"})
  */
 class Product
 {
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue
+     * @Groups({"product","command","commandLine"})
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     * @NotBlank("Nom non renseigné")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Nom ne doit pas etre null")
+     * @Assert\NotBlank(message="Nom ne doit pas etre vide")
+     * @Groups({"product","command","commandLine"})
      */
     private $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="img", type="string", length=255, nullable=false)
-     * @NotBlank("Image non renseignée")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Image ne doit pas etre null")
+     * @Assert\NotBlank(message="Image ne doit pas etre vide")
+     * @Groups({"product","command","commandLine"})
      */
     private $img;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="text", type="text", length=0, nullable=false)
-     * @NotBlank("Texte non renseigné")
+     * @ORM\Column(type="text", length=0)
+     * @NotNull(message="Texte ne doit pas etre null")
+     * @Assert\NotBlank(message="Texte ne doit pas etre vide")
+     * @Groups({"product","command","commandLine"})
      */
     private $text;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="price", type="decimal", precision=5, scale=2, nullable=false)
-     * @NotNull("Prix non renseigné")
+     * @ORM\Column(type="decimal", precision=5, scale=2)
+     * @NotNull(message="Prix ne doit pas etre null")
+     * @Assert\NotBlank(message="Prix ne doit pas etre vide")
+     * @Groups({"product","command","commandLine"})
      */
     private $price;
 
     /**
      * @var \Category
      *
-     * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="category_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * @Groups({"product","command","commandLine"})
      */
     private $category;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="Command", mappedBy="product")
+     * @ORM\ManyToMany(targetEntity=Command::class, mappedBy="product", orphanRemoval=true)
+     * @Groups({"product","command","commandLine"})
      */
     private $command;
 

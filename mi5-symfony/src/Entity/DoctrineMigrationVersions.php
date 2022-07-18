@@ -19,7 +19,7 @@ class DoctrineMigrationVersions
      *
      * @ORM\Column(name="version", type="string", length=191, nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue
      */
     private $version;
 

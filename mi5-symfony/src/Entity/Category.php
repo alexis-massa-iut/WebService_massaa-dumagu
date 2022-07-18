@@ -12,9 +12,10 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotNull;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -34,7 +35,7 @@ class Category
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue
      */
     private $id;
 
@@ -42,7 +43,8 @@ class Category
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     * @NotBlank("Nom non renseigné")
+     * @NotNull(message="Nom ne doit pas etre null")
+     * @Assert\NotBlank(message="Nom ne doit pas etre vide")
      */
     private $name;
 
@@ -50,7 +52,8 @@ class Category
      * @var string
      *
      * @ORM\Column(name="img", type="string", length=255, nullable=false)
-     * @NotBlank("Image non renseigné")
+     * @NotNull(message="Image ne doit pas etre null")
+     * @Assert\NotBlank(message="Image ne doit pas etre vide")
      */
     private $img;
 
@@ -58,7 +61,8 @@ class Category
      * @var string
      *
      * @ORM\Column(name="text", type="text", length=0, nullable=false)
-     * @NotBlank("Texte non renseigné")
+     * @NotNull(message="Texte ne doit pas etre null")
+     * @Assert\NotBlank(message="Texte ne doit pas etre vide")
      */
     private $text;
 

@@ -11,14 +11,17 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * User
  *
- * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_8D93D649E7927C74", columns={"email"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource
  * @ApiFilter(NumericFilter::class, properties={"id"})
  * @ApiFilter(SearchFilter::class, properties={"email": "partial", "name": "partial", "lastname": "partial"})
@@ -28,49 +31,52 @@ class User
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=180, nullable=false)
-     * @NotBlank("Email non renseigné")
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @NotNull(message="Email ne doit pas etre null")
+     * @Assert\NotBlank(message="Email ne doit pas etre vide")
      */
     private $email;
 
     /**
      * @var array
      *
-     * @ORM\Column(name="roles", type="json", nullable=false)
-     * @NotBlank("Roles non renseignés")
+     * @ORM\Column(type="json")
      */
     private $roles;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="password", type="string", length=255, nullable=false)
-     * @NotBlank("Mot de passe non renseigné")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Mot de passe ne doit pas etre null")
+     * @Assert\NotBlank(message="Mot de passe ne doit pas etre vide")
      */
     private $password;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     * @NotBlank("Prénom non renseigné")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Prénom ne doit pas etre null")
+     * @Assert\NotBlank(message="Prénom ne doit pas etre vide")
      */
     private $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="lastname", type="string", length=255, nullable=false)
-     * @NotBlank("Nom non renseigné")
+     * @ORM\Column(type="string", length=255)
+     * @NotNull(message="Nom ne doit pas etre null")
+     * @Assert\NotBlank(message="Nom ne doit pas etre vide")
      */
     private $lastname;
 
@@ -93,7 +99,11 @@ class User
 
     public function getRoles(): array
     {
-        return $this->roles;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
