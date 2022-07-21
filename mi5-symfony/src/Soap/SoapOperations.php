@@ -3,9 +3,11 @@
 namespace App\Soap;
 
 use App\Entity\Command;
-use App\Entity\Product;
+use App\Soap\CommandSoap;
+use App\Soap\ProductSoap;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
+use Laminas\Soap\Client\Common;
 
 /**
  * Class SoapOperations
@@ -24,38 +26,6 @@ class SoapOperations
         $this->doct = $doct;
     }
 
-    /**
-     * Dis "Hello" à la personne passée en paramètre
-     * @param string $name Le nom de la personne à qui dire "Hello!"
-     * @return string The hello string
-     */
-    public function sayHello(string $name): string
-    {
-        return 'Hello ' . $name . '!';
-    }
-
-    /**
-     * Réalise la somme de deux entiers
-     * @param int $a 1er nombre
-     * @param int $b 2ème nombre
-     * @return int La somme des deux entiers
-     */
-    public function sumHello(int $a, int $b): int
-    {
-        return (int)($a + $b);
-    }
-
-    /**
-     * @param float $a
-     * @param float $b
-     * @param float $c
-     * @return float
-     */
-    public function sumFloats(float $a, float $b, float $c): float
-    {
-        return (float)($a + $b + $c);
-    }
-
     /* Comment tester ces méthodes avec SOAP :
         1. Ecrire la méthode souhaitée (ex: getStructureById)
         2. Ajouter un fichier dans le répertoire /soap ou modifier un fichier existant en lien avec l'entité utilisée dans la méthode
@@ -65,31 +35,76 @@ class SoapOperations
     */
 
     /**
-     * Récupère le nom d'un produit avec son id
-     * @param Product $prod le produit sans nom
-     * @return Product le produit avec son id et son nom
+     * ! Je ne sais pas pourquoi cela ne fonctionne pas, il est impossible d'utiliser getRepository(), sinon erreur :
+     * Internal Server Error in C:\wamp64\www\SymfonySoapClient\OperationsSoapClient.php
+     * sur la ligne d'appel des fonctions getProductNameById et getUserCommands
+     * 
+     * Si la fonction ne contient pas d'appel à getRepository(), cela fonctionne correctement
+     * Pour le montrer j'ai créé pour chacune des deux fonctions une fonction qui n'utilise pas getRepository(), en mettant des données en dur
+     * get_product_name_by_id() et get_user_commands() respectivement
      */
-    public function getProductNameById($prod): ?Product
+
+    /**
+     * Récupère le nom d'un produit avec son id
+     * @param \App\Entity\Product $prod le produit sans nom
+     * @return object le produit avec son id et son nom
+     */
+    public function getProductNameById($prod): ?object
     {
-        //Chercher produit par id
-        $product = $this->doct->getRepository(Product::class)->find($prod->getId());
+        // Chercher produit par id
+        $product = $this->doct->getRepository(Product::class)->findOneBy(['id' => $prod->id]);
         // Si le produit est trouvé, on le récupère son nom dans le produit donné en paramètre
         if ($product != null) {
-            $prod->setName($product->getName());
+            $prod->name = $product->name;
         }
+        return $prod;
+    }
+
+    /**
+     * Récupère le nom d'un produit avec son id SANS UTILISER GETREPOSITORY()
+     * @param \App\Entity\Product $prod le produit sans nom
+     * @return object le produit avec son id et son nom
+     */
+    public function get_product_name_by_id($prod): ?object
+    {
+        // Chercher produit par id
+        $prod->name = "Nom en dur";
         return $prod;
     }
 
     /**
      * Récupère les commandes de l'utilisateur avec l'id passé en paramètre
      * @param int L'id de l'utilisateur dont on veut les commandes
-     * @return Collection|Command[] Les commandes de l'utilisateur
+     * @return array Les commandes de l'utilisateur
      */
-    public function getUserCommands($user_id): ?Collection
+    public function getUserCommands($user_id): ?array
     {
-        // Chercher les commandes de l'utilisateur
+        // Chercher les commandes de l'utilisateur avec filtre sur l'id user
         $commands = $this->doct->getRepository(Command::class)->findBy(['user' => $user_id]);
         return $commands;
     }
 
+    /**
+     * Récupère les commandes de l'utilisateur avec l'id passé en paramètre
+     * @param int L'id de l'utilisateur dont on veut les commandes
+     * @return array Les commandes de l'utilisateur
+     */
+    public function get_user_commands($user_id): ?array
+    {
+        // Chercher les commandes de l'utilisateur
+        $commands = [
+            new CommandSoap(1, 1),
+            new CommandSoap(2, 23),
+            new CommandSoap(3, 4),
+            new CommandSoap(4, 13),
+            new CommandSoap(5, 4)
+        ];
+        $toReturn = [];
+        // filtre sur id user
+        foreach ($commands as $key => $value) {
+            if($value->id_user == $user_id)
+                $toReturn[] = $value;
+        }
+        return $toReturn;
+    }
 }
